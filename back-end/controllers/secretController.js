@@ -32,16 +32,24 @@ exports.singleUploadAndProcess = async (req, res) => {
 }
 
 exports.uploadAndProcess = async (req, res) => {
+  console.log("sucess")
   const employees = [];
   const previousAssignments = [];
 
-  await fs.createReadStream(req.files['employees'][0].path)
+  console.log(req.files)
+
+  const files = req.files;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: 'No files uploaded.' });
+    }
+
+  await fs.createReadStream(req.files[0].path)
     .pipe(csv())
     .on('data', (row) => {
       employees.push({ name: row.Employee_Name, email: row.Employee_EmailID });
     })
     .on('end', () => {
-      fs.createReadStream(req.files['previousYear'][0].path)
+      fs.createReadStream(req.files[1].path)
         .pipe(csv())
         .on('data', (row) => {
           previousAssignments.push({
